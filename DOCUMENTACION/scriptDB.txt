@@ -1,0 +1,23 @@
+-- 1. Creamos la base de datos
+CREATE DATABASE StratfordDB;
+USE StratfordDB;
+
+-- 2. Limpiamos por si había una versión anterior
+DROP TABLE IF EXISTS Candidatos;
+
+-- 3. Creamos la tabla oficial
+CREATE TABLE Candidatos (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL,
+    Apellido VARCHAR(50) NOT NULL,
+    Correo VARCHAR(100) NOT NULL UNIQUE,
+    Contrasena VARCHAR(255) NOT NULL,
+    Telefono VARCHAR(20),
+    Carrera VARCHAR(100),
+    FechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Opcional: Insertamos a tu usuario de prueba (sin el error de TipoInteres)
+INSERT INTO Candidatos (Nombre, Apellido, Correo, Contrasena, Telefono, Carrera)
+VALUES ('David', 'Sánchez', 'david04sanchez@gmail.com', 'Prueba1234_', '5571', 'Ingeniería en Sistemas');
+

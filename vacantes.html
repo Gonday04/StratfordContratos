@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stratford Lernen Academy — Admin Portal</title>
+  <style>
+    /* =============================================
+       ESTILOS INTEGRADOS (CSS COMPLETO)
+       ============================================= */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; 
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+
+    .portal {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* Top Bar */
+    .topbar {
+      background: #fff;
+      border-bottom: 3px solid #cc1f1f;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .logo-placeholder {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      width: 90px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .owl-img {
+      width: 64px; height: 64px;
+      background: #cc1f1f;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .welcome-text { font-size: 18px; font-weight: 700; color: #222; }
+
+    /* Menú Centrado Horizontal */
+    .btn-grid {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+      padding: 24px;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+    }
+
+    .action-btn {
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      width: 170px;
+      height: 110px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .action-btn:hover {
+      border-color: #cc1f1f;
+      color: #cc1f1f;
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(204, 31, 31, 0.1);
+    }
+
+    .action-btn.danger { border-color: #cc1f1f; color: #cc1f1f; }
+
+    /* Área de Contenido (Caja Blanca) */
+    .content {
+      display: none; 
+      flex: 1;
+      background: #fff;
+      margin: 20px;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1.5px solid #ddd;
+      overflow-y: auto;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .section-title { font-size: 18px; font-weight: 700; color: #222; margin-bottom: 15px; }
+
+    /* Tablas y Elementos Originales */
+    .table-wrap { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #f9f9f9; padding: 12px; text-align: left; color: #555; border-bottom: 1px solid #eee; }
+    td { padding: 12px; border-bottom: 1px solid #eee; color: #333; }
+    
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-gray { background: #f3f4f6; color: #6b7280; }
+
+    .btn { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #ddd; background: #fff; }
+    .btn-red { background: #cc1f1f; color: #fff; border-color: #cc1f1f; }
+
+    /* Stats & Filtros */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+    .stat-box { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: #fff; }
+    .stat-label { font-size: 12px; color: #777; margin-bottom: 5px; }
+    .stat-num { font-size: 24px; font-weight: 700; color: #222; }
+
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .fpill { padding: 6px 14px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; font-size: 12px; font-weight: 600; background: #fff; }
+    .fpill.active { background: #cc1f1f; color: #fff; border-color: #cc1f1f; }
+
+    /* Modales y Toast */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; }
+    .modal-bg.open { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 25px; width: 450px; max-width: 90%; }
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    input, select { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+    label.fl { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #166534; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: 0.3s; z-index: 200; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="portal">
+    <div class="topbar">
+      <div class="logo-placeholder">aquí va<br>el logo</div>
+      <div style="flex:1; text-align:center">
+        <div class="welcome-text">Bienvenido, [Nombre del usuario] 👋</div>
+      </div>
+      <div class="owl-img">🦉</div>
+    </div>
+
+    <div class="btn-grid" id="main-menu">
+      <div class="action-btn danger" onclick="showToast('Sesión cerrada')">Cerrar sesión</div>
+      <div class="action-btn" onclick="showToast('Módulo: subir Excel')">Subir Excel de<br>Candidatos</div>
+      <div class="action-btn" onclick="openModal('new-candidate')">Crear Candidato<br>Manualmente</div>
+      <div class="action-btn" onclick="showPage('candidatos')">Ver Candidatos</div>
+      <div class="action-btn" onclick="showPage('contratos')">Gestión de<br>Contratos</div>
+    </div>
+
+    <div class="content" id="content-area">
+      <div id="back-bar" style="margin-bottom:16px">
+        <button class="btn" onclick="goHome()">← Regresar</button>
+      </div>
+
+      <div class="page" id="page-candidatos">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px">
+          <div class="section-title" style="margin:0">Candidatos</div>
+          <button class="btn btn-red" onclick="openModal('new-candidate')">+ Nuevo candidato</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Nombre</th><th>Vacante</th><th>Estatus</th><th>Fecha</th><th>Acción</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ana García</td><td>Docente Inglés</td>
+                <td><span class="badge badge-blue">En entrevista</span></td>
+                <td>10 mar 2026</td>
+                <td><button class="btn" onclick="openModal('change-status','Ana García')">Cambiar estatus</button></td>
+              </tr>
+              <tr>
+                <td>Luis Martínez</td><td>Coordinador</td>
+                <td><span class="badge badge-amber">Seleccionado para Contrato</span></td>
+                <td>08 mar 2026</td>
+                <td><button class="btn" onclick="openModal('change-status','Luis Martínez')">Cambiar estatus</button></td>
+              </tr>
+              <tr>
+                <td>Sofía Ramos</td><td>Docente Alemán</td>
+                <td><span class="badge badge-gray">Aplicante</span></td>
+                <td>12 mar 2026</td>
+                <td><button class="btn" onclick="openModal('change-status','Sofía Ramos')">Cambiar estatus</button></td>
+              </tr>
+              <tr>
+                <td>Carlos Ruiz</td><td>Docente Francés</td>
+                <td><span class="badge badge-green">Contratado</span></td>
+                <td>01 mar 2026</td>
+                <td><button class="btn" style="opacity:0.4; cursor:default">—</button></td>
+              </tr>
+              <tr>
+                <td>Petra Díaz</td><td>Docente Inglés</td>
+                <td><span class="badge badge-red">En Firma</span></td>
+                <td>11 mar 2026</td>
+                <td><button class="btn" onclick="openModal('change-status','Petra Díaz')">Cambiar estatus</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page" id="page-contratos">
+        <div class="section-title">Gestión de Contratos</div>
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-label">Seleccionado para Contrato</div><div class="stat-num">2</div></div>
+          <div class="stat-box"><div class="stat-label">En Firma</div><div class="stat-num">1</div></div>
+          <div class="stat-box"><div class="stat-label">Contratado</div><div class="stat-num">1</div></div>
+        </div>
+        <div class="filter-bar">
+          <div class="fpill active" onclick="filterContratos('todos', this)">Todos</div>
+          <div class="fpill" onclick="filterContratos('seleccionado', this)">Seleccionado para Contrato</div>
+          <div class="fpill" onclick="filterContratos('firma', this)">En Firma</div>
+          <div class="fpill" onclick="filterContratos('contratado', this)">Contratado</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Candidato</th><th>Vacante</th><th>Estatus</th><th>Correo enviado</th><th>Último cambio</th><th>Acción</th></tr>
+            </thead>
+            <tbody id="contratos-tbody">
+              <tr data-status="seleccionado">
+                <td>Luis Martínez</td><td>Coordinador</td>
+                <td><span class="badge badge-amber">Seleccionado para Contrato</span></td>
+                <td><span class="badge badge-gray">Pendiente</span></td>
+                <td>08 mar 2026</td>
+                <td><button class="btn btn-red" onclick="openModal('enviar-invitacion','Luis Martínez')">Enviar invitación</button></td>
+              </tr>
+              <tr data-status="seleccionado">
+                <td>Ana García</td><td>Docente Inglés</td>
+                <td><span class="badge badge-amber">Seleccionado para Contrato</span></td>
+                <td><span class="badge badge-green">Enviado ✓</span></td>
+                <td>10 mar 2026</td>
+                <td><button class="btn" onclick="openModal('mover-firma','Ana García')">Mover a En Firma</button></td>
+              </tr>
+              <tr data-status="firma">
+                <td>Petra Díaz</td><td>Docente Inglés</td>
+                <td><span class="badge badge-red">En Firma</span></td>
+                <td><span class="badge badge-green">Enviado ✓</span></td>
+                <td>11 mar 2026</td>
+                <td><button class="btn btn-red" onclick="openModal('confirmar-contrato','Petra Díaz')">Confirmar Contrato</button></td>
+              </tr>
+              <tr data-status="contratado">
+                <td>Carlos Ruiz</td><td>Docente Francés</td>
+                <td><span class="badge badge-green">Contratado</span></td>
+                <td><span class="badge badge-green">Enviado ✓</span></td>
+                <td>01 mar 2026</td>
+                <td><span style="font-size:12px; color:#aaa">Proceso completo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modal-bg" onclick="closeModal(event)"><div class="modal" id="modal-box"></div></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function showPage(id) {
+      document.getElementById('main-menu').style.display = 'none';
+      document.getElementById('content-area').style.display = 'block';
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+    }
+
+    function goHome() {
+      document.getElementById('content-area').style.display = 'none';
+      document.getElementById('main-menu').style.display = 'flex';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function openModal(type, name) {
+      const bg = document.getElementById('modal-bg');
+      const box = document.getElementById('modal-box');
+      let html = '';
+
+      if (type === 'new-candidate') {
+        html = `<div class="modal-title">Crear candidato manualmente</div>
+                <label class="fl">Nombre completo</label><input type="text" placeholder="Ej: Ana García">
+                <label class="fl">Vacante</label><select><option>Docente Inglés</option><option>Coordinador</option></select>
+                <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-red" onclick="closeModal(); showToast('Candidato creado')">Guardar</button></div>`;
+      } else if (type === 'change-status') {
+        html = `<div class="modal-title">Cambiar estatus — ${name}</div>
+                <label class="fl">Nuevo estatus</label><select><option>Aplicante</option><option>En entrevista</option><option>Seleccionado</option><option>Contratado</option></select>
+                <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-red" onclick="closeModal(); showToast('Actualizado')">Guardar</button></div>`;
+      } else if (type === 'enviar-invitacion') {
+        html = `<div class="modal-title">Enviar invitación — ${name}</div><p style="font-size:13px">Se enviará un correo para firma de contrato.</p>
+                <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-red" onclick="closeModal(); showToast('Correo enviado')">Enviar</button></div>`;
+      } else if (type === 'mover-firma') {
+        html = `<div class="modal-title">Mover a En Firma — ${name}</div><p style="font-size:13px">¿Confirmas el cambio de estatus?</p>
+                <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-red" onclick="closeModal(); showToast('Movido a Firma')">Confirmar</button></div>`;
+      } else if (type === 'confirmar-contrato') {
+        html = `<div class="modal-title">Confirmar Contrato — ${name}</div><p style="font-size:13px">Cerrar proceso como contratado.</p>
+                <div class="modal-actions"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-red" onclick="closeModal(); showToast('Contratado ✓')">Confirmar</button></div>`;
+      }
+
+      box.innerHTML = html;
+      bg.classList.add('open');
+    }
+
+    function closeModal(e) {
+      if (!e || e.target === document.getElementById('modal-bg')) {
+        document.getElementById('modal-bg').classList.remove('open');
+      }
+    }
+
+    function filterContratos(status, el) {
+      document.querySelectorAll('.fpill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('#contratos-tbody tr').forEach(tr => {
+        tr.style.display = (status === 'todos' || tr.dataset.status === status) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
+
+
+  

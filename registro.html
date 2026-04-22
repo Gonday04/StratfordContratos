@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratford - Registro</title>
+    <link rel="stylesheet" href="Estilos/portal.css">
+</head>
+<body>
+
+    <div class="screen active" style="display: flex; align-items: center; justify-content: center; background: #f5f5f5; padding: 40px 0;">
+    <header class="stripe-bar"></header>
+    
+    <div class="login-card" style="margin-top: 20px; margin-bottom: 20px;">
+    <div class="login-logo">
+        <img src="Imagenes/logo.png" alt="Logo Stratford" class="lp">
+        <p>Stratford Lernen Academy</p>
+    </div>
+    <h2>CREAR CUENTA</h2>
+    <p class="sub">Completa tus datos para registrarte</p>
+
+    <form id="formRegistro">
+        <label class="field-label" style="margin-top:10px;">Nombre(s)</label>
+        <input type="text" id="regNombre" placeholder="Ej. Ana" required>
+        
+        <label class="field-label">Apellido(s)</label>
+        <input type="text" id="regApellido" placeholder="Ej. García" required>
+        
+        <label class="field-label">Correo electrónico</label>
+        <input type="email" id="regCorreo" placeholder="tu@correo.com" required>
+        
+        <label class="field-label">Contraseña</label>
+        <div class="password-wrapper">
+            <input type="password" id="regContrasena" placeholder="Escribe tu contraseña" required>
+            <span class="toggle-password" onclick="togglePassword('regContrasena', this)">👁️</span>
+        </div>
+        
+        <label class="field-label">Teléfono</label>
+        <input type="tel" id="regTelefono" placeholder="55 1234 5678" required>
+        
+        <label class="field-label">Carrera</label>
+        <input type="text" id="regCarrera" placeholder="Ej. Pedagogía" required>
+        
+        <button type="submit" class="btn-primary" style="background: #b91c1c;">Registrarse</button>
+        <p id="mensajeRegistro" style="display:none; text-align:center; margin-top:15px; font-size:13px; font-weight:bold;"></p>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center;">
+        <p class="sub" style="margin-bottom: 10px;">¿Ya tienes una cuenta?</p>
+        <button type="button" class="btn" style="width: 100%;" onclick="window.location.href='index.html'">Regresar al Login</button>
+    </div>
+    </div>
+    
+    <footer class="stripe-bar"></footer>
+    </div>
+
+<script src="JS/registro.js"></script>
+</body>
+</html>
