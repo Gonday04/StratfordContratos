@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stratford Lernen Academy — Portal de Contratos</title>
   <link rel="stylesheet" href="Estilos/portal.css">
 </head>
+
 <body>
 
   <div class="screen active" id="screen-login">
@@ -17,7 +19,7 @@
       </div>
       <h2>Portal de Contratos</h2>
       <p class="sub">Ingresa con tu correo y contraseña</p>
-      
+
       <label class="field-label">Modalidad de ingreso</label>
       <div class="radio-group">
         <label><input type="radio" name="modalidad" value="social" checked> Servicio Social</label>
@@ -26,23 +28,24 @@
 
       <label class="field-label">Correo electrónico</label>
       <input type="email" id="login-email" placeholder="tu@correo.com">
-      
+
       <label class="field-label">Contraseña</label>
       <div class="password-wrapper">
-    <input type="password" id="login-pass" placeholder="Ingresa tu contraseña" required>
-    <span class="toggle-password" onclick="togglePassword('login-pass', this)">👁️</span>
-</div>
-      
+        <input type="password" id="login-pass" placeholder="Ingresa tu contraseña" required>
+        <span class="toggle-password" onclick="togglePassword('login-pass', this)">👁️</span>
+      </div>
+
       <p class="error-msg" id="login-error">Correo o contraseña incorrectos.</p>
-      
+
       <label class="remember-label">
         <input type="checkbox"> Recuérdame
       </label>
-      
+
       <button class="btn-primary" onclick="doLogin()">Iniciar Sesión</button>
       <div style="margin-top: 25px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
         <p class="sub" style="margin-bottom: 12px; margin-top: 0;">¿Aún no tienes cuenta?</p>
-        <button type="button" class="btn" style="width: 100%; border-color: #03104d; color: #03104d;" onclick="window.location.href='registro.html'">
+        <button type="button" class="btn" style="width: 100%; border-color: #03104d; color: #03104d;"
+          onclick="window.location.href='registro.html'">
           Registrarse
         </button>
       </div>
@@ -67,7 +70,7 @@
 
     <div class="page-content">
       <h3 style="color:#03104d; margin-bottom: 20px; font-size: 16px;">Vacantes Disponibles</h3>
-      
+
       <div class="vacantes-grid">
         <div class="vacante-card">
           <div class="vacante-header">
@@ -76,7 +79,8 @@
           </div>
           <div class="vacante-body">
             <p>Buscamos docente con certificación B2/C1 para impartir clases a nivel medio y superior.</p>
-            <button class="btn-outline-green" onclick="selectVacante('Docente de Inglés')">Seleccionar y Firmar →</button>
+            <button class="btn-outline-green" onclick="selectVacante('Docente de Inglés')">Seleccionar y Firmar
+              →</button>
           </div>
         </div>
 
@@ -87,7 +91,8 @@
           </div>
           <div class="vacante-body">
             <p>Encargado de la supervisión de planes de estudio y seguimiento a la plantilla docente.</p>
-            <button class="btn-outline-green" onclick="selectVacante('Coordinador Académico')">Seleccionar y Firmar →</button>
+            <button class="btn-outline-green" onclick="selectVacante('Coordinador Académico')">Seleccionar y Firmar
+              →</button>
           </div>
         </div>
       </div>
@@ -104,7 +109,7 @@
       <span class="topbar-title">Portal de Contratos</span>
       <img src="Imagenes/buho.png" alt="Búho" class="logo-placeholder">
     </div>
-    
+
     <div class="welcome-banner">
       <div class="welcome-text">
         <h2>Bienvenida, Ana García 👋</h2>
@@ -116,9 +121,9 @@
     <div class="page-content">
       <div class="steps" id="steps-bar">
         <div class="step active" id="step1-tab"><span class="step-num">1</span>Mis datos</div>
-        <div class="step"        id="step2-tab"><span class="step-num">2</span>Previsualizar</div>
-        <div class="step"        id="step3-tab"><span class="step-num">3</span>Firma</div>
-        <div class="step"        id="step4-tab"><span class="step-num">4</span>Listo</div>
+        <div class="step" id="step2-tab"><span class="step-num">2</span>Previsualizar</div>
+        <div class="step" id="step3-tab"><span class="step-num">3</span>Firma</div>
+        <div class="step" id="step4-tab"><span class="step-num">4</span>Listo</div>
       </div>
 
       <div id="step1">
@@ -129,39 +134,74 @@
           </div>
           <div class="contract-card-body">
             <div class="contract-meta">
-              <div class="meta-item"><label>Empresa</label><p>Academia ST Lernen S.C.</p></div>
-              <div class="meta-item"><label>Tipo</label><p id="tipo-contrato-text">Servicio Social / Prácticas</p></div>
+              <div class="meta-item"><label>Empresa</label>
+                <p>Academia ST Lernen S.C.</p>
+              </div>
+              <div class="meta-item"><label>Tipo</label>
+                <p id="tipo-contrato-text">Servicio Social / Prácticas</p>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="form-section">
-          <h3>Completa tus datos</h3>
-          <div class="form-grid">
-            <div class="field-group">
-              <label>Nombre completo</label>
-              <input type="text" id="f-nombre" value="Ana García López" placeholder="Nombre completo">
+          <div class="form-section">
+            <h3>Completa tus datos</h3>
+
+            <div id="form-social" class="form-grid">
+              <div class="field-group">
+                <label>Nombre completo</label>
+                <input type="text" id="f-nombre" placeholder="Nombre completo">
+              </div>
+              <div class="field-group">
+                <label>Fecha del contrato</label>
+                <input type="date" id="f-fecha">
+              </div>
+              <div class="field-group">
+                <label>Carrera</label>
+                <input type="text" id="f-carrera" placeholder="Ej: Ingeniería en Sistemas">
+              </div>
+              <div class="field-group">
+                <label>Escuela / Universidad</label>
+                <input type="text" id="f-escuela" placeholder="Nombre de tu institución">
+              </div>
+              <div class="field-group">
+                <label>Número de identificación / Matrícula</label>
+                <input type="text" id="f-matricula" placeholder="Ej: 20221045">
+              </div>
+              <div class="field-group">
+                <label>Correo electrónico</label>
+                <input type="email" id="f-correo" placeholder="tu@correo.com">
+              </div>
             </div>
-            <div class="field-group">
-              <label>Fecha del contrato</label>
-              <input type="date" id="f-fecha" value="2026-03-16">
+
+            <div id="form-laboral" class="form-grid" style="display:none;">
+              <div class="field-group">
+                <label>Nombre completo</label>
+                <input type="text" id="fl-nombre" placeholder="Nombre completo">
+              </div>
+              <div class="field-group">
+                <label>Ciudad de firma</label>
+                <input type="text" id="fl-ciudad" placeholder="Ej: Ciudad de México">
+              </div>
+              <div class="field-group">
+                <label>Fecha del contrato</label>
+                <input type="date" id="fl-fecha">
+              </div>
+              <div class="field-group">
+                <label>Puesto</label>
+                <input type="text" id="fl-puesto" readonly style="background:#f5f5f5; color:#555;">
+              </div>
+              <div class="field-group">
+                <label>Salario mensual</label>
+                <input type="text" id="fl-salario" placeholder="Ej: $8,000.00 MXN">
+              </div>
+              <div class="field-group">
+                <label>Horario / Jornada</label>
+                <input type="text" id="fl-jornada" placeholder="Ej: L-V 9:00 a 14:00">
+              </div>
             </div>
-            <div class="field-group">
-              <label>Carrera</label>
-              <input type="text" id="f-carrera" placeholder="Ej: Ingeniería en Sistemas">
-            </div>
-            <div class="field-group">
-              <label>Escuela / Universidad</label>
-              <input type="text" id="f-escuela" placeholder="Nombre de tu institución">
-            </div>
-            <div class="field-group">
-              <label>Número de identificación / Matrícula</label>
-              <input type="text" id="f-matricula" placeholder="Ej: 20221045">
-            </div>
-            <div class="field-group">
-              <label>Correo electrónico</label>
-              <input type="email" id="f-correo" value="ana.garcia@ejemplo.com">
-            </div>
+
           </div>
         </div>
 
@@ -172,9 +212,9 @@
 
       <div id="step2" style="display:none">
         <div class="preview-doc" id="preview-doc-content">
-          </div>
+        </div>
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
-          <button class="btn"     onclick="goStep(1)">← Editar datos</button>
+          <button class="btn" onclick="goStep(1)">← Editar datos</button>
           <button class="btn btn-red" onclick="goStep(3)">Continuar a firma →</button>
         </div>
       </div>
@@ -256,7 +296,8 @@
         <button class="close-btn" onclick="closePdfModal()">✕</button>
       </div>
       <div id="pdf-modal-body"></div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:12px;border-top:1px solid #eee">
+      <div
+        style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:12px;border-top:1px solid #eee">
         <button class="btn" onclick="closePdfModal()">Cerrar</button>
       </div>
     </div>
@@ -266,4 +307,5 @@
 
   <script src="JS/contratos.js"></script>
 </body>
+
 </html>

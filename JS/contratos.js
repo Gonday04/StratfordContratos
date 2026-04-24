@@ -13,6 +13,9 @@ let sigLastX         = 0;
 let sigLastY         = 0;
 let sigListenersAdded = false;
 
+let vacanteSeleccionada = "";
+let currentModalidad = "social"; 
+
 /* ════════════════════════
    AUTENTICACIÓN Y FLUJO
 ════════════════════════ */
@@ -23,8 +26,9 @@ function doLogin() {
   const pass  = document.getElementById('login-pass').value.trim();
   const err   = document.getElementById('login-error');
   const modalidad = document.querySelector('input[name="modalidad"]:checked').value;
+  
+  currentModalidad = modalidad; // Guardamos la modalidad globalmente
 
-  // 1. Validamos que no deje los campos vacíos
   if (!email || !pass) {
     if(err) {
       err.style.display = 'block';
@@ -34,18 +38,11 @@ function doLogin() {
   }
   if(err) err.style.display = 'none';
 
-  // 2. Armamos el paquete chiquito para el Login
-  const credenciales = {
-      correo: email,
-      contrasena: pass
-  };
+  const credenciales = { correo: email, contrasena: pass };
 
-  // 3. ¡Apuntamos a la bóveda de C#!
   fetch('http://localhost:5084/api/auth/login', {
       method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credenciales)
   })
   .then(response => response.json())
@@ -62,13 +59,11 @@ function doLogin() {
 
           actualizarNombresUI();
 
-          if (modalidad === 'laboral') {
+          if (currentModalidad === 'laboral') {
             goTo('screen-vacantes');
           } else {
             const tipoContrato = document.getElementById('tipo-contrato-text');
-            if(tipoContrato) {
-              tipoContrato.textContent = "Servicio Social / Prácticas";
-            }
+            if(tipoContrato) tipoContrato.textContent = "Servicio Social / Prácticas";
             goStep(1); 
             goTo('screen-contract');
           }
@@ -82,21 +77,27 @@ function doLogin() {
   });
 }
 
-function doLogout() {
-  location.reload();
-}
-
 function selectVacante(titulo) {
   vacanteSeleccionada = titulo;
+  currentModalidad = 'laboral'; // Por seguridad confirmamos que es laboral
   
   const tipoContrato = document.getElementById('tipo-contrato-text');
   if(tipoContrato) {
       tipoContrato.textContent = "Mercado Laboral - " + titulo;
   }
 
+  // Pre-llenamos el campo de puesto en el formulario laboral
+  const fPuesto = document.getElementById('fl-puesto');
+  if(fPuesto) fPuesto.value = titulo;
+
   goStep(1);
   goTo('screen-contract');
 }
+
+function doLogout() {
+  location.reload();
+}
+
 
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => {
@@ -127,20 +128,170 @@ function goStep(n) {
     }
   });
 
+  // Mostrar el formulario correcto en el paso 1
+  if (n === 1) {
+    document.getElementById('form-social').style.display = (currentModalidad === 'social') ? 'grid' : 'none';
+    document.getElementById('form-laboral').style.display = (currentModalidad === 'laboral') ? 'grid' : 'none';
+  }
+
   window.scrollTo(0, 0);
   if (n === 2) renderPreview();
   if (n === 3) setTimeout(initSigPad, 150);
 }
 
 function getFormData() {
-  return {
-    nombre:    document.getElementById('f-nombre')?.value    || '_______________',
-    fecha:     formatDate(document.getElementById('f-fecha')?.value),
-    carrera:   document.getElementById('f-carrera')?.value   || '_______________',
-    escuela:   document.getElementById('f-escuela')?.value   || '_______________',
-    matricula: document.getElementById('f-matricula')?.value || '_______________',
-    correo:    document.getElementById('f-correo')?.value    || '_______________',
-  };
+  if (currentModalidad === 'laboral') {
+    return {
+      tipo:    'laboral',
+      nombre:  document.getElementById('fl-nombre')?.value  || '_______________',
+      ciudad:  document.getElementById('fl-ciudad')?.value  || '_______________',
+      fecha:   formatDate(document.getElementById('fl-fecha')?.value),
+      puesto:  document.getElementById('fl-puesto')?.value  || '_______________',
+      salario: document.getElementById('fl-salario')?.value || '_______________',
+      jornada: document.getElementById('fl-jornada')?.value || '_______________'
+    };
+  } else {
+    return {
+      tipo:    'social',
+      nombre:  document.getElementById('f-nombre')?.value    || '_______________',
+      fecha:   formatDate(document.getElementById('f-fecha')?.value),
+      carrera: document.getElementById('f-carrera')?.value   || '_______________',
+      escuela: document.getElementById('f-escuela')?.value   || '_______________',
+      matricula: document.getElementById('f-matricula')?.value || '_______________',
+      correo:  document.getElementById('f-correo')?.value    || '_______________'
+    };
+  }
+}
+
+function buildContractHTML(d, sigImg) {
+  if (d.tipo === 'laboral') {
+    // --- CONTRATO LABORAL ---
+    return `
+      <div class="doc-header">
+        <div style="font-size:11px;color:#666;margin-bottom:8px;text-align:center;">
+          ACADEMIA ST LERNEN S.C. | Av. Ángel de la Independencia #36, col. Metropolitana 2da sección,
+          Ciudad Nezahualcóyotl, Estado de México CP. 57740
+        </div>
+        <h2>CONTRATO INDIVIDUAL DE TRABAJO</h2>
+        <p style="font-size:13px; font-weight:bold; margin-top:8px;">MODALIDAD: CAPACITACIÓN INICIAL – MEDIO TIEMPO</p>
+      </div>
+   
+      <div class="doc-body">
+        <p>En la Ciudad de <strong>${d.ciudad}</strong>, a <strong>${d.fecha}</strong>, comparecen por una parte <strong>ACADEMIA ST LERNEN S.C.</strong>, con domicilio en Av. Ángel de la Independencia #36, Col. Metropolitana 2ª Sección, Ciudad Nezahualcóyotl, Estado de México, CP 57740, a quien en lo sucesivo se le denominará “EL PATRÓN”, y por la otra <strong>${d.nombre}</strong>, a quien se denominará “EL TRABAJADOR”, al tenor de las siguientes:</p>
+   
+        <p class="doc-section-title">DECLARACIONES</p>
+        <p><strong>I. Declara EL PATRÓN:</strong><br>Que se dedica a actividades educativas y de formación académica y que requiere personal para apoyo administrativo y de gestión escolar.</p>
+        <p><strong>II. Declara EL TRABAJADOR:</strong><br>Que cuenta con conocimientos básicos y desea adquirir experiencia y capacitación para desempeñar funciones administrativas y de gestión escolar.</p>
+   
+        <p class="doc-section-title">CLÁUSULAS</p>
+        <p><strong>PRIMERA. Tipo de contrato</strong><br>El presente contrato se celebra bajo la modalidad de Contrato de Capacitación Inicial conforme al artículo 39-B de la Ley Federal del Trabajo.</p>
+        <p><strong>SEGUNDA. Puesto</strong><br>EL TRABAJADOR desempeñará el puesto de <strong>${d.puesto}</strong>.</p>
+        <p><strong>TERCERA. Actividades</strong><br>Atención a alumnos y padres de familia, control de inscripciones, pagos y expedientes, organización de horarios y grupos, registro de asistencias y apoyo administrativo general.</p>
+        <p><strong>CUARTA. Jornada</strong><br>Medio tiempo: <strong>${d.jornada}</strong>.</p>
+        <p><strong>QUINTA. Lugar de trabajo</strong><br>Instalaciones de ACADEMIA ST LERNEN S.C. y modalidad en línea cuando se requiera.</p>
+        <p><strong>SEXTA. Duración</strong><br>Hasta 3 meses como periodo de capacitación inicial.</p>
+        <p><strong>SÉPTIMA. Salario</strong><br><strong>${d.salario}</strong>.</p>
+        <p><strong>OCTAVA. Prestaciones</strong><br>Las que correspondan conforme a la Ley Federal del Trabajo y Ley del Seguro Social, de manera proporcional.</p>
+        <p><strong>NOVENA. Capacitación</strong><br>EL PATRÓN brindará la capacitación necesaria.</p>
+        <p><strong>DÉCIMA. Obligaciones</strong><br>Cumplir horario, funciones, reglamentos y cuidar bienes e información.</p>
+        <p><strong>DÉCIMA PRIMERA. Rescisión</strong><br>Conforme al artículo 47 de la Ley Federal del Trabajo y artículo 39-B.</p>
+        
+        <p style="margin-top:20px; text-align:justify;">Leído que fue el presente contrato y enteradas las partes, lo firman de conformidad.</p>
+   
+        <div class="firma-area">
+          <div class="firma-box">
+            <div style="height:70px;"></div>
+            <div class="firma-line"></div>
+            <p>Ing. Viridiana Reynoso Sánchez</p>
+            <small>EL PATRÓN</small>
+          </div>
+          <div class="firma-box">
+            <div style="height:70px;position:relative;">
+              ${sigImg ? `<img src="${sigImg}" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);max-width:200px;max-height:65px;">` : ''}
+            </div>
+            <div class="firma-line"></div>
+            <p>${d.nombre}</p>
+            <small>EL TRABAJADOR</small>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    // --- CONTRATO SERVICIO SOCIAL (Se queda tal cual lo tenías) ---
+    return `
+      <div class="doc-header">
+        <div style="font-size:11px;color:#666;margin-bottom:8px">
+          ACADEMIA ST LERNEN S.C. | Av. Ángel de la Independencia #36, col. Metropolitana 2da sección,
+          Ciudad Nezahualcóyotl, Estado de México CP. 57740
+        </div>
+        <h2>CONTRATO DE PRESTACIÓN DE SERVICIOS</h2>
+        <p style="font-size:12px;margin-top:8px">Fecha ${d.fecha}</p>
+      </div>
+   
+      <div class="doc-body">
+        <p><strong>PRESENTE</strong></p>
+   
+        <p>Este documento denominado como "Contrato de prestación de Servicios" que celebra por una parte la Academia ST. Lernen,
+        En adelante nombrado como "Prestador" y por la otra parte el/la <strong>${d.nombre}</strong>
+        de la carrera <strong>${d.carrera}</strong> de la Escuela <strong>${d.escuela}</strong>
+        con Número de identificación <strong>${d.matricula}</strong> denominado en lo sucesivo el
+        "Practicante/Trabajador", Al tenor de las siguientes:</p>
+   
+        <p>La Academia <strong>ST Lernen</strong> Ubicada en
+        <strong>Av. Ángel de la independencia #36, col. Metropolitana 2da sección,
+        Ciudad Nezahualcóyotl Estado de México CP. 57740</strong>
+        con un número de teléfono <strong>56 10 97 64 82</strong> y un correo de contacto:
+        <strong>academiastratfordlernen@gmail.com</strong></p>
+   
+        <p>Acepto yo "Practicante/Trabajador" que dentro de las instalaciones de ST Lernen Academy tendré un
+        periodo de prestación previamente definido por la Institución de procedencia, acorde a dicho
+        periodo de prestación Acepto que mis actividades serán definidas por la Academia ST Lernen
+        en donde dichas actividades y sus respectivas reglas son:</p>
+   
+        <p class="doc-section-title">Actividades y reglas:</p>
+        <ul>
+          <li>Cumplir con el horario establecido</li>
+          <li>1 retardo injustificado equivaldría a la baja del programa</li>
+          <li>1 falta injustificada equivaldría a la baja del programa</li>
+          <li>Falta de compromiso equivaldría a la baja del programa</li>
+          <li>Las sesiones de capacitación son obligatorias</li>
+          <li>El horario se programa de acuerdo al horario laboral/escolar enviado</li>
+          <li>El horario que se programe en fin de semana es obligatorio
+              (restricciones al correo: academiastratfordlernen@gmail.com)</li>
+          <li>Las restricciones laborales únicamente son aceptadas para fines de semana</li>
+          <li>Cumplir de la mejor manera las actividades asignadas de manera presencial como en línea</li>
+          <li>Cumplir con los proyectos asignados en tiempo y forma</li>
+          <li>En caso de dar asesoramiento y/o clases, reportar el avance de manera diaria</li>
+        </ul>
+   
+        <p class="doc-section-title">Compromisos de Stratford Lernen Academy:</p>
+        <ol style="margin-left:20px">
+          <li>Hacer conocer y cumplir con el presente contrato</li>
+          <li>No recibir a ningún prestador sin carta de presentación</li>
+          <li>No recibir a ningún prestador sin haber firmado este contrato</li>
+          <li>Contribuir a la formación humanística, académica y profesional del estudiante</li>
+          <li>Ubicar al estudiante en temas relacionados con su profesión</li>
+          <li>Brindar el ambiente y espacio adecuado para el desarrollo de actividades</li>
+          <li>Contar con un responsable para la operación eficiente del programa</li>
+        </ol>
+   
+        <div class="firma-area">
+          <div class="firma-box">
+            <div style="height:70px;"></div>
+            <div class="firma-line"></div>
+            <p>Ing. Viridiana Reynoso Sánchez</p>
+            <small>ADMINISTRADOR GENERAL</small>
+          </div>
+          <div class="firma-box">
+            <div style="height:70px;position:relative;">
+              ${sigImg ? `<img src="${sigImg}" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);max-width:200px;max-height:65px;">` : ''}
+            </div>
+            <div class="firma-line"></div>
+            <p>${d.nombre}</p>
+            <small>NOMBRE Y FIRMA</small>
+          </div>
+        </div>
+      </div>`;
+  }
 }
 
 function formatDate(val) {
@@ -157,81 +308,7 @@ function renderPreview() {
   if (previewDiv) previewDiv.innerHTML = buildContractHTML(d, null);
 }
 
-function buildContractHTML(d, sigImg) {
-  return `
-    <div class="doc-header">
-      <div style="font-size:11px;color:#666;margin-bottom:8px">
-        ACADEMIA ST LERNEN S.C. | Av. Ángel de la Independencia #36, col. Metropolitana 2da sección,
-        Ciudad Nezahualcóyotl, Estado de México CP. 57740
-      </div>
-      <h2>CONTRATO DE PRESTACIÓN DE SERVICIOS</h2>
-      <p style="font-size:12px;margin-top:8px">Fecha ${d.fecha}</p>
-    </div>
- 
-    <div class="doc-body">
-      <p><strong>PRESENTE</strong></p>
- 
-      <p>Este documento denominado como "Contrato de prestación de Servicios" que celebra por una parte la Academia ST. Lernen,
-      En adelante nombrado como "Prestador" y por la otra parte el/la <strong>${d.nombre}</strong>
-      de la carrera <strong>${d.carrera}</strong> de la Escuela <strong>${d.escuela}</strong>
-      con Número de identificación <strong>${d.matricula}</strong> denominado en lo sucesivo el
-      "Practicante/Trabajador", Al tenor de las siguientes:</p>
- 
-      <p>La Academia <strong>ST Lernen</strong> Ubicada en
-      <strong>Av. Ángel de la independencia #36, col. Metropolitana 2da sección,
-      Ciudad Nezahualcóyotl Estado de México CP. 57740</strong>
-      con un número de teléfono <strong>56 10 97 64 82</strong> y un correo de contacto:
-      <strong>academiastratfordlernen@gmail.com</strong></p>
- 
-      <p>Acepto yo "Practicante/Trabajador" que dentro de las instalaciones de ST Lernen Academy tendré un
-      periodo de prestación previamente definido por la Institución de procedencia, acorde a dicho
-      periodo de prestación Acepto que mis actividades serán definidas por la Academia ST Lernen
-      en donde dichas actividades y sus respectivas reglas son:</p>
- 
-      <p class="doc-section-title">Actividades y reglas:</p>
-      <ul>
-        <li>Cumplir con el horario establecido</li>
-        <li>1 retardo injustificado equivaldría a la baja del programa</li>
-        <li>1 falta injustificada equivaldría a la baja del programa</li>
-        <li>Falta de compromiso equivaldría a la baja del programa</li>
-        <li>Las sesiones de capacitación son obligatorias</li>
-        <li>El horario se programa de acuerdo al horario laboral/escolar enviado</li>
-        <li>El horario que se programe en fin de semana es obligatorio
-            (restricciones al correo: academiastratfordlernen@gmail.com)</li>
-        <li>Las restricciones laborales únicamente son aceptadas para fines de semana</li>
-        <li>Cumplir de la mejor manera las actividades asignadas de manera presencial como en línea</li>
-        <li>Cumplir con los proyectos asignados en tiempo y forma</li>
-        <li>En caso de dar asesoramiento y/o clases, reportar el avance de manera diaria</li>
-      </ul>
- 
-      <p class="doc-section-title">Compromisos de Stratford Lernen Academy:</p>
-      <ol style="margin-left:20px">
-        <li>Hacer conocer y cumplir con el presente contrato</li>
-        <li>No recibir a ningún prestador sin carta de presentación</li>
-        <li>No recibir a ningún prestador sin haber firmado este contrato</li>
-        <li>Contribuir a la formación humanística, académica y profesional del estudiante</li>
-        <li>Ubicar al estudiante en temas relacionados con su profesión</li>
-        <li>Brindar el ambiente y espacio adecuado para el desarrollo de actividades</li>
-        <li>Contar con un responsable para la operación eficiente del programa</li>
-      </ol>
- 
-      <div class="firma-area">
-        <div class="firma-box">
-          <div style="height:70px;"></div>
-          <div class="firma-line"></div>
-          <p>Ing. Viridiana Reynoso Sánchez</p>
-          <small>ADMINISTRADOR GENERAL</small>
-        </div>
-        <div class="firma-box">
-          <div style="height:70px;position:relative;">
-            ${sigImg ? `<img src="${sigImg}" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);max-width:200px;max-height:65px;">` : ''}
-          </div>
-          <div class="firma-line"></div>
-          <p>${d.nombre}</p>
-          <small>NOMBRE Y FIRMA</small>
-        </div>
-      </div>`;
-}
+
 
 /* ════════════════════════
    PAD DE FIRMA
